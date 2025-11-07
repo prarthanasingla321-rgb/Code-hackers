@@ -1,0 +1,11 @@
+FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY prisma ./prisma
+RUN npx prisma generate
+COPY src ./src
+RUN npx tsc --init >/dev/null 2>&1 || true
+RUN npm i -D typescript && npx tsc --outDir dist --esModuleInterop --module commonjs --target ES2020
+EXPOSE 3001
+CMD ["node", "dist/main.js"]
